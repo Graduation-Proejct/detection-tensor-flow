@@ -1534,17 +1534,23 @@ class VisualizeSingleFrameDetections(EvalMetricOpsVisualization):
 current_frame = 0
 prev_H = 0
 prev_W = 0
-max_number_of_frames = 120
-m = 2 # change in width and height margin
+max_number_of_frames = 10
+m = 3 # change in width and height margin
 is_faint = False
 width_to_height_ratio = 0
+not_faint_counter = 0
 sio = socketio.Client()
-sio.connect('https://faintrush.herokuapp.com/')
-sio.emit("join", { "name": "detector", "type": "detector", "room": "1" })
+
 @sio.event
-def reset(data):
+def reset(data):    
     is_faint = False
     print('reset received')
+    
+sio.connect('https://faintrush.herokuapp.com/', headers= { "token": "4Xhk8fcNNWeRf11j5gKSt3KIHyT1VMCh" })
+sio.emit("join", { "name": "detector", "type": "detector", "room": "1" })
+
+ 
+
 def faint_detection(current_W, current_H):
     global current_frame
     global prev_H
@@ -1552,23 +1558,24 @@ def faint_detection(current_W, current_H):
     global f
     global m
     global is_faint
+   # global not_faint_counter
     if not is_faint:
         if current_W != 0 and current_H != 0 :
             if current_frame == 0 :
                 prev_H = current_H
                 prev_W = current_W
-                
             print(str(current_frame) + ' WC = '+ str(current_W) +' HC = '+ str(current_H)+ ' WP = '+ str(prev_W) +' HP = '+ str(prev_H))
             if current_H >= current_W :
                 current_frame = 0
             if current_H < current_W and  not (current_W <= prev_W + m and current_W >= prev_W - m) and not (current_H <= prev_H + m and current_H >= prev_H - m)  and current_frame < max_number_of_frames:
                 current_frame = 0 
             if current_H < current_W and  (current_W <= prev_W + m and current_W >= prev_W - m) and (current_H <= prev_H + m and current_H >= prev_H - m)  and current_frame < max_number_of_frames:
-                current_frame = current_frame + 1
+                current_frame = current_frame + 1   
             if current_H < current_W and  (current_W <= prev_W + m and current_W >= prev_W - m) and (current_H <= prev_H + m and current_H >= prev_H - m)  and current_frame >= max_number_of_frames:
                 print('Faint!!!!')
                 sio.emit('faint-detected')
                 current_frame = 0
                 is_faint = True
+              
             prev_H = current_H
             prev_W = current_W 

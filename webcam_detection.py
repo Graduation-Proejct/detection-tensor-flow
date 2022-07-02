@@ -33,7 +33,9 @@ def load_model(model_name):
 PATH_TO_LABELS = 'models/research/object_detection/data/mscoco_label_map.pbtxt'
 category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
  
-model_name = 'ssd_inception_v2_coco_2017_11_17'
+#model_name = 'ssd_inception_v2_coco_2017_11_17'
+model_name = 'ssd_inception_v2_coco_2018_01_28'
+
 detection_model = load_model(model_name)
  
 def run_inference_for_single_image(model, image):
@@ -84,8 +86,8 @@ def show_inference(model, frame):
       category_index,
       instance_masks=output_dict.get('detection_masks_reframed', None),
       use_normalized_coordinates=True,
-      line_thickness=5)
- 
+      line_thickness=1)
+
   return(image_np)
 import cv2
 video_capture = cv2.VideoCapture(0)
